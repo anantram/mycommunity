@@ -35,6 +35,25 @@ class housedb(db.Model):
 	house_number = db.StringProperty()
 	house_pass = db.StringProperty()
 
+class duesdb(db.Model):
+	house_id = db.IntegerProperty()
+	due_detail = db.StringProperty()
+	due_amount = db.IntegerProperty()
+	due_month = db.StringProperty()
+	due_year = db.StringProperty()
+	due_type = db.StringProperty()
+	due_created = db.DateTimeProperty()
+
+class paymentsdb(db.Model):
+	house_id = db.IntegerProperty()
+	payment_detail = db.StringProperty()
+	payment_amount = db.IntegerProperty()
+	payment_month = db.StringProperty()
+	payment_year = db.StringProperty()
+	payment_type = db.StringProperty()
+	payment_created = db.DateTimeProperty()
+
+
 
 class MainHandler(webapp2.RequestHandler):
     def write(self, *a, **kw):
@@ -119,7 +138,7 @@ class commuser(MainHandler):
 		houselist = housedb.all()
 		house_exists = False;
 		for house in houselist:
-			if house.house_name == comm_house_number:
+			if house.house_number == comm_house_number:
 				if house.house_pass == comm_house_pass:
 					house_exists = True
 					self.response.headers.add_header('Set-Cookie', 'logged_house_id = %s' % (str)(house.house_id))
@@ -139,22 +158,64 @@ class newhome(MainHandler):
 		dbIn = housedb(house_id = listlength, house_number = comm_house_number, house_pass = comm_house_pass,house_comm_id = comm_id)  
 		dbIn.put()
 		self.redirect("/loggedadmin")
+
 class loggedadmin(MainHandler):
 	def get(self):
+
 		self.render("admindash.html")
 
 class loggeduser(MainHandler):
 	def get(self):
-		self.render("userdash.html")
+		house_id = (int)(self.request.cookies.get('logged_house_id'))
+		due_list = db.GqlQuery("select * from duesdb where house_id = %(kwarg)d" % {'kwarg':house_id})
+		dues = due_list.fetch(100)
+		self.render("userdash.html", dues = dues)
 
+class newMonth(MainHandler):
+	def post(self):
+		month = self.request.get("month")
+		year = self.request.get("year")
+		amount = self.request.get("amount")
+		paymentType = self.request.get("type")
+		detail = self.request.get("detail")
+
+		dues = duesdb.all()
+		due_exists = False
+		for due in dues:
+			if due.due_month == month:
+				if due.due_year == year:
+					if due.due_type == paymentType:
+						if paymentType == "monthly":
+							due_exists = True
+							break
+						else:
+							if detail == due.due_detail:
+								due_exists = True
+								break
+
+		if not due_exists:
+
+			current_time = datetime.datetime.now()
+			houses = housedb.all()
+			comm_id = (int)(self.request.cookies.get('logged_community_id'))
+			for house in houses:
+				if house.house_comm_id == comm_id:
+					dbIn = duesdb(due_month = month, due_year = year, due_amount =(int)(amount), due_type = paymentType, due_detail = detail,
+						house_id = house.house_id, due_created = current_time)
+					dbIn.put()
+					self.redirect("/loggedadmin")
+		else:
+			self.redirect("/loggedadmin")
 
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/commlogin', commlogin),
     ('/commadmin', commadmin),
+    ('/commuser', commuser),
     ('/community', community),
     ('/loggedadmin', loggedadmin),
     ('/loggeduser', loggeduser),
-    ('/newhome', newhome)
+    ('/newhome', newhome),
+    ('/newmonth', newMonth)
 ], debug=True)

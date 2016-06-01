@@ -5,11 +5,48 @@
 </head>
 <body>
 hello admin
-
+Create new house
 <form action = "newhome" method = "post">
 <input type = "text" name = "house_number">
 <input type = "text" name = "house_password">
 <input type="submit">
 </form>
+<br>
+<br>
+create new month
+<form action = "newmonth" method="post">
+<select name="month">
+    <option value="Jan">Jan</option>
+    <option value="Feb">Feb</option>
+    <option value="Mar">March</option>
+    <option value="Apr">April</option>
+    <option value="May">May</option>
+    <option value="Jun">June</option>
+    <option value="Jul">July</option>
+    <option value="Agu">August</option>
+    <option value="Sep">September</option>
+    <option value="Oct">October</option>
+    <option value="Nov">November</option>
+    <option value="dec">December</option>
+</select>
+  <select name = "year">
+    {% for i in range(2016,2037) %}
+        <option value={{i}}>{{i}}</option>
+    {% endfor %}
+  </select>
+  <select name = "type">
+      <option value = "monthly">Monthly</option>
+      <option value="event">Event</option>
+  </select>
+  <br>
+    Detail
+    <br>
+    <input type="text" name="detail"> 
+    <br>
+  Amount
+  <br>
+  <input type="text" name="amount">
+  <input type="submit">
+  </form>
 </body>
 </html>

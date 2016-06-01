@@ -5,5 +5,14 @@
 </head>
 <body>
 hello user
+<br>
+Dues
+<table>
+<th><td>Month</td><td>Year</td><td>amount</td><td>Type</td></th>
+{% for due in dues %}
+<tr><td></td><td>{{due.due_month}}</td><td>{{due.due_year}}</td><td>{{due.due_amount}}</td><td>{{due.due_type}}</td></tr>
+{% endfor %}
+	
+</table>
 </body>
 </html>
