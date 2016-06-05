@@ -24,6 +24,8 @@ from google.appengine.ext import db
 template_dir = os.path.join(os.path.dirname(__file__),'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape = True)
 
+# Databases
+
 class communitydb(db.Model):
 	community_id = db.IntegerProperty()
 	community_name = db.StringProperty()
@@ -34,6 +36,14 @@ class housedb(db.Model):
 	house_id = db.IntegerProperty()
 	house_number = db.StringProperty()
 	house_pass = db.StringProperty()
+
+class houseownerdb(db.Model):
+	house_comm_id = db.IntegerProperty()
+	house_id = db.IntegerProperty()
+	house_owner = db.StringProperty()
+	house_contact = db.StringProperty()
+	house_status = db.BooleanProperty()
+	house_number = db.StringProperty()
 
 class duesdb(db.Model):
 	house_id = db.IntegerProperty()
@@ -53,7 +63,7 @@ class paymentsdb(db.Model):
 	payment_type = db.StringProperty()
 	payment_created = db.DateTimeProperty()
 
-
+# Fuctions
 
 class MainHandler(webapp2.RequestHandler):
     def write(self, *a, **kw):
@@ -103,6 +113,7 @@ class commlogin(MainHandler):
 			if community.community_name == comm_name:
 				community_exists = True
 				self.response.headers.add_header('Set-Cookie', 'logged_community_id = %s' % (str)(community.community_id))
+				self.response.headers.add_header('Set-Cookie', 'logged_community_name = %s' % (str)(community.community_name))
 				break
 		if community_exists:
 			self.redirect("/community")
@@ -142,6 +153,7 @@ class commuser(MainHandler):
 				if house.house_pass == comm_house_pass:
 					house_exists = True
 					self.response.headers.add_header('Set-Cookie', 'logged_house_id = %s' % (str)(house.house_id))
+					self.response.headers.add_header('Set-Cookie', 'logged_house_name = %s' % (str)(house.house_number))
 					break
 		if house_exists:
 			self.redirect("/loggeduser")
@@ -149,20 +161,32 @@ class commuser(MainHandler):
 			self.redirect("/commlogin")
 
 class newhome(MainHandler):
+	def get(self):
+		self.render("newhome.html")
+
 	def post(self):
 		comm_id = (int)(self.request.cookies.get('logged_community_id'))
 		comm_house_number = self.request.get("house_number")
-		comm_house_pass = self.request.get("house_number")
+		comm_house_pass = self.request.get("house_pass")
+		comm_house_owner = self.request.get("house_owner_name")
+		comm_house_contact = self.request.get("house_owner_contact")
+
 		houselist = housedb.all()
 		listlength = houselist.count() + 1
 		dbIn = housedb(house_id = listlength, house_number = comm_house_number, house_pass = comm_house_pass,house_comm_id = comm_id)  
+		dbIn.put()
+		dbIn = houseownerdb(house_id = listlength, house_number = comm_house_number, house_owner = comm_house_owner, 
+			house_comm_id = comm_id, house_contact = comm_house_contact, house_status = True )  
 		dbIn.put()
 		self.redirect("/loggedadmin")
 
 class loggedadmin(MainHandler):
 	def get(self):
-
-		self.render("admindash.html")
+		comm_id = (int)(self.request.cookies.get('logged_community_id'))
+		comm_name = self.request.cookies.get('logged_community_name')
+		house_list = db.GqlQuery("select * from houseownerdb where house_comm_id = %(kwarg)d" % {'kwarg':comm_id})
+		houses = house_list.fetch(100)
+		self.render("admindash.html", houses = houses, comm_name = comm_name)
 
 class loggeduser(MainHandler):
 	def get(self):
@@ -194,7 +218,6 @@ class newMonth(MainHandler):
 								break
 
 		if not due_exists:
-
 			current_time = datetime.datetime.now()
 			houses = housedb.all()
 			comm_id = (int)(self.request.cookies.get('logged_community_id'))
@@ -207,6 +230,21 @@ class newMonth(MainHandler):
 		else:
 			self.redirect("/loggedadmin")
 
+class logout(MainHandler):
+	def get(self):
+		self.response.headers.add_header('Set-Cookie', 'logged_house_id = ""')
+		self.response.headers.add_header('Set-Cookie', 'logged_house_name = ""')
+		self.redirect('/community')
+
+class dues(MainHandler):
+	def post(self):
+		house_id = (int)(self.request.get("house_id"))
+		dbIn = db.GqlQuery("select * from duesdb where house_id = %(name)d order by due_created" % {'name':house_id})
+		dues = dbIn.fetch(100)
+		self.render("dues.html", dues = dues, house_id = house_id)
+
+
+
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
@@ -217,5 +255,7 @@ app = webapp2.WSGIApplication([
     ('/loggedadmin', loggedadmin),
     ('/loggeduser', loggeduser),
     ('/newhome', newhome),
-    ('/newmonth', newMonth)
+    ('/newmonth', newMonth),
+    ('/logout', logout),
+    ('/due',dues)
 ], debug=True)

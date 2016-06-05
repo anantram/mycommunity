@@ -1,52 +1,291 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>asdas</title>
-</head>
-<body>
-hello admin
-Create new house
-<form action = "newhome" method = "post">
-<input type = "text" name = "house_number">
-<input type = "text" name = "house_password">
-<input type="submit">
-</form>
-<br>
-<br>
-create new month
-<form action = "newmonth" method="post">
-<select name="month">
-    <option value="Jan">Jan</option>
-    <option value="Feb">Feb</option>
-    <option value="Mar">March</option>
-    <option value="Apr">April</option>
-    <option value="May">May</option>
-    <option value="Jun">June</option>
-    <option value="Jul">July</option>
-    <option value="Agu">August</option>
-    <option value="Sep">September</option>
-    <option value="Oct">October</option>
-    <option value="Nov">November</option>
-    <option value="dec">December</option>
-</select>
-  <select name = "year">
-    {% for i in range(2016,2037) %}
-        <option value={{i}}>{{i}}</option>
-    {% endfor %}
-  </select>
-  <select name = "type">
-      <option value = "monthly">Monthly</option>
-      <option value="event">Event</option>
-  </select>
-  <br>
-    Detail
-    <br>
-    <input type="text" name="detail"> 
-    <br>
-  Amount
-  <br>
-  <input type="text" name="amount">
-  <input type="submit">
-  </form>
-</body>
+
+<html lang="en">
+	<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>{{comm_name}}</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<link rel="icon" href="http://getbootstrap.com/favicon.ico">
+		<link href="./css/bootstrap.min.css" rel="stylesheet">
+		<link href="./css/bootstrap-theme.min.css" rel="stylesheet">
+		<link href="./css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+		<link href="./css/accounts.css" rel="stylesheet">
+		<link href="./css/theme.css" rel="stylesheet">
+		<script src="./js/ie-emulation-modes-warning.js"></script>
+		<script src="./js/account.js"></script>
+		<script src="./js/account-1.js"></script>
+		
+		<style type="text/css">
+			.navbar-nav.navbar-right:last-child {
+				margin-right: 15px !important;
+			}
+			.navbar-content {
+				width:320px;
+				padding: 15px;
+				padding-bottom:0px;
+			}
+			.navbar-content:before, .navbar-content:after{
+				display: table;
+				content: "";
+				line-height: 0;
+			}
+			.dropdown-menu {
+				padding: 0px;
+				overflow: hidden;
+			}
+			.navbar-footer-content { 
+				padding:15px 15px 15px 15px; 
+			}
+			.row{
+				padding-left: 5%;
+			}
+			.page-header{
+				padding-left: 43%
+			}
+
+			body {
+				background-image:url(./css/images/4.jpg);
+				background-repeat:no-repeat;
+				background-size:cover;
+			}
+		</style>
+	</head>
+	<body>
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="/loggedadmin">Zeenat</a>
+				</div>
+				<div id="navbar" class="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						<li class="active"></li>
+						<li><a onclick="newhome()">New House</a></li>
+						<li><a onclick="newcollection()">New Collection</a></li>
+						<li><a onclick="dues()">Dues</a></li>
+						<li class="dropdown"><a href="http://getbootstrap.com/examples/theme/#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a href="http://getbootstrap.com/examples/theme/#">Action</a></li>
+								<li><a href="http://getbootstrap.com/examples/theme/#">Another action</a></li>
+								<li><a href="http://getbootstrap.com/examples/theme/#">Something else here</a></li>
+								<li role="separator" class="divider"></li>
+								<li class="dropdown-header">Nav header</li>
+								<li><a href="http://getbootstrap.com/examples/theme/#">Separated link</a></li>
+								<li><a href="http://getbootstrap.com/examples/theme/#">One more separated link</a></li>
+							</ul>
+						</li>
+					</ul>
+
+					<ul class="nav navbar-nav navbar-right">
+						<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Account
+							<b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li>
+									<div class="navbar-content">
+										<div class="row">
+											<div class="col-md-7">
+												<span>Bhaumik Patel</span>
+												<p class="text-muted small">
+														mail@gmail.com</p>
+												<div class="divider">
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="navbar-footer">
+										<div class="navbar-footer-content">
+											<div class="row">
+												<div class="col-md-6">
+													<a href="#" class="btn btn-default btn-sm">Change Passowrd</a>
+												</div>
+												<div class="col-md-6">
+													<a href="logout" class="btn btn-default btn-sm pull-right">Sign Out</a>
+												</div>
+											</div>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</li>
+					</ul>  
+				</div>
+			</div>
+		</nav>
+		<!-- End of nav bar -->
+
+		<div class="page-header">
+			<h1>Welcome Admin</h1>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-4">
+				<div class="panel panel-success">
+					<div class="panel-heading">
+						<h3 class="panel-title">Colony Name</h3>
+					</div>
+					<div class="panel-body">
+						{{comm_name}}
+					</div>
+				</div>
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h3 class="panel-title">Contact</h3>
+					</div>
+					<div class="panel-body">
+						9959391264
+					</div>
+				</div>
+				<div class="panel panel-success">
+					<div class="panel-heading">
+						<h3 class="panel-title">Total Due</h3>
+					</div>
+					<div class="panel-body">
+							200000
+					</div>
+				</div>
+			</div>
+			<!-- Colomn 2 starts -->
+			<div class="col-sm-4" style="display:none"  id = "functioncolomn">
+	<!-- new Collection -->
+				<div class="panel panel-info" id = "newcollection">
+					<div class="panel-heading">
+						<h3 class="panel-title">New Collection</h3>
+					</div>
+					<div class="panel-body">
+						<form action = "newmonth" method="post">
+		  					<select name="month" class="dropdown">
+			  					<ul class="dropdown-menu">
+			                		<li><option value="Jan">Jan</option></li>
+							      	<li><option value="Feb">Feb</option></li>
+							      	<option value="Mar">March</option>
+								    <option value="Apr">April</option>
+								    <option value="May">May</option>
+								    <option value="Jun">June</option>
+								    <option value="Jul">July</option>
+								    <option value="Agu">August</option>
+								    <option value="Sep">September</option>
+								    <option value="Oct">October</option>
+								    <option value="Nov">November</option>
+								    <option value="dec">December</option>
+			              		</ul>
+		  					</select>
+			  				<select name = "year">
+			    				{% for i in range(2016,2037) %}
+			        			<option value={{i}}>{{i}}</option>
+			    				{% endfor %}
+			  				</select>
+			  				<select name = "type">
+			      				<option value = "monthly">Monthly</option>
+			      				<option value="event">Event</option>
+			  				</select>
+			  				<br>
+			    			Detail
+			    			<br>
+			    			<input type="text" name="detail"> 
+			    			<br>
+			  				Amount
+			  				<br>
+			  				<input type="text" name="amount">
+			 				<input type="submit">
+						</form>	
+					</div>
+	            </div>
+	<!-- Dues -->
+	            <div class="panel panel-info" id = "dues" style="display:none">
+					<div class="panel-heading">
+						<h3 class="panel-title">Dues</h3>
+					</div>
+					<div class="panel-body">
+						<form action = "due" method="post"> 
+  							<select name = "house_id" id = "house_id" onclick="populatedues()">
+    							{% for house in houses %}
+        						<option value={{house.house_id}}>{{house.house_number}}</option>
+    							{% endfor %}
+  							</select>
+  							<button type="submit" class="btn btn-lg btn-success">Find</button>
+
+  						</form>
+					</div>
+	            </div>
+	<!-- new house -->
+	            <div class="panel panel-info" id = "newhome" style="display:none">
+					<div class="panel-heading">
+						<h3 class="panel-title">New House</h3>
+					</div>
+					<div class="panel-body">
+						<form action = "newhome" method="post">
+						House Number
+							<input type="text" name="house_number">
+							<br>
+							<br>
+						House Password
+							<input type="text" name="house_pass">
+							<br>
+							<br>
+						Owner Name
+							<input type="text" name="house_owner_name">
+							<br>
+							<br>
+						Owner Contact
+							<input type="text" name="house_owner_contact">
+							<br>
+							<button type="submit" class="btn btn-lg btn-success">Create</button> 	
+						</form>
+					</div>
+	            </div>
+			</div>
+<!-- Owners -->
+			<div class="col-md-6" id = "ownerslist">
+          		<table class="table table-striped">
+            		<thead>
+              			<tr>
+                		<th>House Number</th>
+                		<th>House Owner</th>
+                		<th>Contact</th>
+                		<th>Status</th>
+              			</tr>
+            		</thead>
+            		<tbody>
+            		{% for house in houses %}
+              			<tr>
+                		<td>{{house.house_number}}</td>
+                		<td>{{house.house_owner}}</td>
+                		<td>{{house.house_contact}}</td>
+                		<td>{{house.house_status}}</td>
+              			</tr>
+              		{% endfor %}
+            		</tbody>
+          	</table>
+        </div>
+
+		
+		<!-- Scripts -->
+		<script type="text/javascript">
+			function dues() {
+        		document.getElementById('dues').style.display = "block";
+        		document.getElementById('newcollection').style.display = "none";
+        		document.getElementById('newhome').style.display = "none";
+        		document.getElementById('ownerslist').style.display = "none";
+        		document.getElementById('functioncolomn').style.display = "block";
+
+
+
+    		}
+    		function newcollection() {
+        		document.getElementById('dues').style.display = "none";
+        		document.getElementById('newcollection').style.display = "block";
+        		document.getElementById('newhome').style.display = "none";
+        		document.getElementById('ownerslist').style.display = "none";
+        		document.getElementById('functioncolomn').style.display = "block";
+    		}
+
+    		function newhome() {
+        		document.getElementById('dues').style.display = "none";
+        		document.getElementById('newcollection').style.display = "none";
+        		document.getElementById('newhome').style.display = "block";
+        		document.getElementById('ownerslist').style.display = "none";
+        		document.getElementById('functioncolomn').style.display = "block";
+    		}
+		</script>
+	</body>
 </html>

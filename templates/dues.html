@@ -1,0 +1,131 @@
+
+<html lang="en">
+	<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>{{comm_name}}</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<link rel="icon" href="http://getbootstrap.com/favicon.ico">
+		<link href="./css/bootstrap.min.css" rel="stylesheet">
+		<link href="./css/bootstrap-theme.min.css" rel="stylesheet">
+		<link href="./css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+		<link href="./css/accounts.css" rel="stylesheet">
+		<link href="./css/theme.css" rel="stylesheet">
+		<script src="./js/ie-emulation-modes-warning.js"></script>
+		<script src="./js/account.js"></script>
+		<script src="./js/account-1.js"></script>
+		
+		<style type="text/css">
+			.navbar-nav.navbar-right:last-child {
+				margin-right: 15px !important;
+			}
+			.navbar-content {
+				width:320px;
+				padding: 15px;
+				padding-bottom:0px;
+			}
+			.navbar-content:before, .navbar-content:after{
+				display: table;
+				content: "";
+				line-height: 0;
+			}
+			.dropdown-menu {
+				padding: 0px;
+				overflow: hidden;
+			}
+			.navbar-footer-content { 
+				padding:15px 15px 15px 15px; 
+			}
+			.row{
+				padding-left: 5%;
+			}
+			.page-header{
+				padding-left: 43%
+			}
+
+			body {
+				background-image:url(./css/images/4.jpg);
+				background-repeat:no-repeat;
+				background-size:cover;
+			}
+		</style>
+	</head>
+	<body>
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="/loggedadmin">Zeenat</a>
+				</div>
+			</div>
+		</nav>
+		<!-- End of nav bar -->
+
+		<div class="page-header">
+			<h1>Welcome Admin</h1>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-4">
+				<div class="panel panel-success">
+					<div class="panel-heading">
+						<h3 class="panel-title">Colony Name</h3>
+					</div>
+					<div class="panel-body">
+						{{comm_name}}
+					</div>
+				</div>
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h3 class="panel-title">Contact</h3>
+					</div>
+					<div class="panel-body">
+						9959391264
+					</div>
+				</div>
+				<div class="panel panel-success">
+					<div class="panel-heading">
+						<h3 class="panel-title">Total Due</h3>
+					</div>
+					<div class="panel-body">
+							200000
+					</div>
+				</div>
+			</div>
+			<!-- Colomn 2 starts -->
+			<div class="col-md-6">
+				<div class="panel panel-info" id = "newcollection">
+					<div class="panel-heading">
+						<h3 class="panel-title">Dues of {{house_id}}</h3>
+					</div>
+					<div class="panel-body">
+					<table class="table table-striped">
+            		<thead>
+              			<tr>
+                		<th>Month</th>
+                		<th>Year</th>
+                		<th>Detail</th>
+                		<th>Amount</th>
+                		<th>Type</th>
+                		<th>Pay</th>
+              			</tr>
+            		</thead>
+            		<tbody>
+            		{% for due in dues %}
+              			<tr>
+                		<td>{{due.due_month}}</td>
+                		<td>{{due.due_year}}</td>
+                		<td>{{due.due_detail}}</td>
+                		<td>{{due.due_amount}}</td>
+                		<td>{{due.due_type}}</td>
+                		<td> Pay</td>
+              			</tr>
+              		{% endfor %}
+            		</tbody>
+          			</table>
+					</div>
+	            </div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -98,7 +98,7 @@
 													<a href="#" class="btn btn-default btn-sm">Change Passowrd</a>
 												</div>
 												<div class="col-md-6">
-													<a href="/logout" class="btn btn-default btn-sm pull-right">Sign Out</a>
+													<a href="http://www.jquery2dotnet.com" class="btn btn-default btn-sm pull-right">Sign Out</a>
 												</div>
 											</div>
 										</div>
@@ -115,11 +115,54 @@
 		</div>
 		<div class="row">
 			<div class="col-sm-4">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Owner Name</h3>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<table class="table">
+								<thead>
+									<tr>
+										<th>Number</th>
+										<th> Name</th>
+										<th>Age</th>
+										<th>Gender</th>
+										<th>Contact</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>1</td>
+										<td>Mark</td>
+										<td>Otto</td>
+										<td>@mdo</td>
+									</tr>
+									<tr>
+										<td>2</td>
+										<td>Jacob</td>
+										<td>Thornton</td>
+										<td>@fat</td>
+									</tr>
+									<tr>
+										<td>3</td>
+										<td>Larry</td>
+										<td>the Bird</td>
+										<td>@twitter</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.col-sm-4 -->
+			<div class="col-sm-4">
 				<div class="panel panel-success">
 					<div class="panel-heading">
 						<h3 class="panel-title">Owner name</h3>
 					</div>
-					<div class="panel-body" id ="test">
+					<div class="panel-body">
 							RAM KUMAR
 					</div>
 				</div>
@@ -136,38 +179,7 @@
 						<h3 class="panel-title">Total Due</h3>
 					</div>
 					<div class="panel-body">
-							2000
-					</div>
-				</div>
-			</div>
-			<div class="col-sm-4">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">Dues</h3>
-					</div>
-					<div class="panel-body">
-						<div class="row">
-							<table class="table">
-								<thead>
-									<tr>
-										<td>Month</td>
-										<td>Year</td>
-										<td>Amount</td>
-										<td>Type</td>
-									</tr>
-								</thead>
-								<tbody>
-								{% for due in dues %}
-									<tr>
-									<td>{{due.due_month}}</td>
-									<td>{{due.due_year}}</td>
-									<td>{{due.due_amount}}</td>
-									<td>{{due.due_type}}</td>
-									</tr>
-								{% endfor %}
-								</tbody>
-							</table>
-						</div>
+							1000000
 					</div>
 				</div>
 			</div>
