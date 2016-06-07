@@ -120,7 +120,7 @@
 						<h3 class="panel-title">Owner name</h3>
 					</div>
 					<div class="panel-body" id ="test">
-							RAM KUMAR
+							{{houseowner}}
 					</div>
 				</div>
 				<div class="panel panel-info">
@@ -128,7 +128,7 @@
 						<h3 class="panel-title">Contact</h3>
 					</div>
 					<div class="panel-body">
-						9959391264
+						{{housecontact}}
 					</div>
 				</div>
 				<div class="panel panel-success">
@@ -136,11 +136,11 @@
 						<h3 class="panel-title">Total Due</h3>
 					</div>
 					<div class="panel-body">
-							2000
+							Rs:  {{totaldue}}/-
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-4">
+			<div class="col-md-6">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
 						<h3 class="panel-title">Dues</h3>
@@ -163,6 +163,39 @@
 									<td>{{due.due_year}}</td>
 									<td>{{due.due_amount}}</td>
 									<td>{{due.due_type}}</td>
+									</tr>
+								{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+<!-- payments -->
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Payments</h3>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<table class="table">
+								<thead>
+									<tr>
+										<td>Month</td>
+										<td>Year</td>
+										<td> Detail </td>
+										<td>Amount</td>
+										<td>Type</td>
+
+									</tr>
+								</thead>
+								<tbody>
+								{% for payment in payments %}
+									<tr>
+									<td>{{payment.payment_month}}</td>
+									<td>{{payment.payment_year}}</td>
+									<td>{{payment.payment_detail}}</td>
+									<td>{{payment.payment_amount}}</td>
+									<td>{{payment.payment_type}}</td>
 									</tr>
 								{% endfor %}
 								</tbody>

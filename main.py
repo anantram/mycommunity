@@ -146,16 +146,24 @@ class commuser(MainHandler):
 		comm_house_number = self.request.get("comm_house_number")
 		comm_house_pass = self.request.get("comm_house_password")
 		comm_id = self.request.cookies.get('logged_community_id')
+		house_id = ""
 		houselist = housedb.all()
 		house_exists = False;
 		for house in houselist:
 			if house.house_number == comm_house_number:
 				if house.house_pass == comm_house_pass:
 					house_exists = True
+					house_id = house.house_id
 					self.response.headers.add_header('Set-Cookie', 'logged_house_id = %s' % (str)(house.house_id))
 					self.response.headers.add_header('Set-Cookie', 'logged_house_name = %s' % (str)(house.house_number))
 					break
+		ownerlist = houseownerdb.all()
 		if house_exists:
+			for owner in ownerlist:
+				if owner.house_id == house_id:
+					self.response.headers.add_header('Set-Cookie', 'logged_house_owner = %s' % (str)(owner.house_owner))
+					self.response.headers.add_header('Set-Cookie', 'logged_house_contact = %s' % (str)(owner.house_contact))
+					break
 			self.redirect("/loggeduser")
 		else:
 			self.redirect("/commlogin")
@@ -191,9 +199,18 @@ class loggedadmin(MainHandler):
 class loggeduser(MainHandler):
 	def get(self):
 		house_id = (int)(self.request.cookies.get('logged_house_id'))
+		house_owner = self.request.cookies.get('logged_house_owner')
+		house_contact = self.request.cookies.get('logged_house_contact')
+
 		due_list = db.GqlQuery("select * from duesdb where house_id = %(kwarg)d" % {'kwarg':house_id})
 		dues = due_list.fetch(100)
-		self.render("userdash.html", dues = dues)
+		payment_list = db.GqlQuery("select * from paymentsdb where house_id = %(kwarg)d" % {'kwarg':house_id})
+		payments = payment_list.fetch(100)
+		totaldue = 0
+		for due in dues:
+			totaldue = totaldue + due.due_amount
+		self.render("userdash.html", dues = dues, payments = payments, totaldue = totaldue, houseowner = house_owner,
+			housecontact = house_contact)
 
 class newMonth(MainHandler):
 	def post(self):
