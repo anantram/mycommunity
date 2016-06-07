@@ -1,16 +1,40 @@
 <html>
 <body>
-<b> Create new community</b>
-<form action = "" method = "post">
-	<input type = "text" name = "comm_name">
-	<input type = "text" name = "comm_pass1">
-	<input type="text" name="comm_pass2">
-	<input type="submit" name="create">
-</form>
-<form action="commlogin" method = "post">
-	<input type = "text" name = "comm_name">
-	<input type="submit" name="login">
-</form>
-{{error}}
+<link rel="stylesheet" type="text/css" href="./css/home.css">
+
+<!-- <img src="home.gif" alt="Mountain View" style="width:100px;height:1000px;"> -->
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">            
+            <div class="wrap">
+            <div class="f">
+                <form action="" method="post">
+                    <p class="form-title">
+                    CREATE COMMUNITY
+                    {{error}}
+                </p>
+                    <input type="text" name="comm_name"  placeholder="community name"><br><br>
+                    <input type="password" name="comm_pass1" placeholder="Password" ><br><br>
+                    <input type="password" name="comm_pass2" placeholder="Re-enter Password" /><br><br>
+                    <input type="submit" value="Create" /><br><br>
+                </form>
+
+                <form  action="commlogin" method="post">
+                    <p class="form-title">
+                    COMMUNITY LOGIN</p>                     
+                    <input type = "text" name = "comm_name"><br><br>
+                    <!-- <input type="submit" name="login"><br><br> -->
+                    <input type="submit" value="Sign In" class="btn btn-success btn-sm" />
+                    <label>
+                        <input type="checkbox" />
+                            Remember Me
+                        </label>
+                </form>
+                </div>      
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -243,8 +243,36 @@ class dues(MainHandler):
 		dues = dbIn.fetch(100)
 		self.render("dues.html", dues = dues, house_id = house_id)
 
-
-
+class paydue(MainHandler):
+	def post(self):
+		house_id = self.request.get("house_id")
+		due_month = self.request.get("due_month")
+		due_year = self.request.get("due_year")
+		due_amount = self.request.get("due_amount")
+		due_detail = self.request.get("due_detail")
+		due_type = self.request.get("due_type")
+		current_time = datetime.datetime.now()
+		dues = duesdb.all()
+		due_found = False
+		for due in dues:
+			if due.house_id == (int)(house_id):
+				if due.due_year == due_year:
+					if due.due_month == due_month:
+						if due.due_type == "monthly":
+							due.delete()
+							due_found = True
+							break
+						else:
+							if due.due_detail == due_detail:
+								due.delete()
+								due_found = True
+								break
+		if due_found:
+			dbIn = paymentsdb(payment_month = due_month, payment_year = due_year, payment_amount =(int)(due_amount), 
+				payment_type = due_type, payment_detail = due_detail, house_id = (int)(house_id), payment_created = current_time)
+			dbIn.put()
+	
+		self.redirect('/loggedadmin')
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
@@ -257,5 +285,6 @@ app = webapp2.WSGIApplication([
     ('/newhome', newhome),
     ('/newmonth', newMonth),
     ('/logout', logout),
-    ('/due',dues)
+    ('/due',dues),
+    ('/paydue',paydue )
 ], debug=True)

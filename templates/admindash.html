@@ -251,7 +251,11 @@
                 		<td>{{house.house_number}}</td>
                 		<td>{{house.house_owner}}</td>
                 		<td>{{house.house_contact}}</td>
-                		<td>{{house.house_status}}</td>
+            			{% if house.house_status %}
+                		<td>Occupied</td>
+                		{% else %}
+                		<td>Unoccupied</td>
+                		{% endif %}
               			</tr>
               		{% endfor %}
             		</tbody>
@@ -267,8 +271,6 @@
         		document.getElementById('newhome').style.display = "none";
         		document.getElementById('ownerslist').style.display = "none";
         		document.getElementById('functioncolomn').style.display = "block";
-
-
 
     		}
     		function newcollection() {
