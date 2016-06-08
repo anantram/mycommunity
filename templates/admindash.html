@@ -60,12 +60,11 @@
 				<div id="navbar" class="navbar-collapse collapse">
 					<ul class="nav navbar-nav">
 						<li class="active"></li>
-						<li><a onclick="newhome()">New House</a></li>
+						<li><a onclick ="newhome()">New House</a></li>
 						<li><a onclick="newcollection()">New Collection</a></li>
-						<li><a onclick="dues()">Dues</a></li>
-						<li class="dropdown"><a href="http://getbootstrap.com/examples/theme/#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+						<li class="dropdown"><a href="http://getbootstrap.com/examples/theme/#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account <span class="caret"></span></a>
 							<ul class="dropdown-menu">
-								<li><a href="http://getbootstrap.com/examples/theme/#">Action</a></li>
+								<li><a onclick="dues()">Dues</a></li>
 								<li><a href="http://getbootstrap.com/examples/theme/#">Another action</a></li>
 								<li><a href="http://getbootstrap.com/examples/theme/#">Something else here</a></li>
 								<li role="separator" class="divider"></li>
@@ -137,10 +136,10 @@
 				</div>
 				<div class="panel panel-success">
 					<div class="panel-heading">
-						<h3 class="panel-title">Total Due</h3>
+						<h3 class="panel-title">Amount left</h3>
 					</div>
 					<div class="panel-body">
-							200000
+							Rs: {{amountleft}} /-
 					</div>
 				</div>
 			</div>
@@ -198,8 +197,8 @@
 					<div class="panel-body">
 						<form action = "due" method="post"> 
   							<select name = "house_id" id = "house_id" onclick="populatedues()">
-    							{% for house in houses %}
-        						<option value={{house.house_id}}>{{house.house_number}}</option>
+    							{% for house in houses1 %}
+        						<option value={{house.key()}}>{{house.house_number}}</option>
     							{% endfor %}
   							</select>
   							<button type="submit" class="btn btn-lg btn-success">Find</button>
@@ -230,6 +229,91 @@
 							<input type="text" name="house_owner_contact">
 							<br>
 							<button type="submit" class="btn btn-lg btn-success">Create</button> 	
+						</form>
+					</div>
+	            </div>
+	<!-- New Expense -->
+				<div class="panel panel-info" id = "newhome" style="display:block">
+					<div class="panel-heading">
+						<h3 class="panel-title">New Expense</h3>
+					</div>
+					<div class="panel-body">
+						<form action = "newexpense" method="post">
+						Expense Detail
+							<input type="text" name="expense_detail">
+							<br>
+							<br>
+						Expense Amount
+							<input type="text" name="expense_amount">
+							<br>
+							<br>
+						Expense Month
+							<select name="expense_month" class="dropdown">
+			  					<ul class="dropdown-menu">
+			                		<li><option value="Jan">Jan</option></li>
+							      	<li><option value="Feb">Feb</option></li>
+							      	<option value="Mar">March</option>
+								    <option value="Apr">April</option>
+								    <option value="May">May</option>
+								    <option value="Jun">June</option>
+								    <option value="Jul">July</option>
+								    <option value="Agu">August</option>
+								    <option value="Sep">September</option>
+								    <option value="Oct">October</option>
+								    <option value="Nov">November</option>
+								    <option value="dec">December</option>
+			              		</ul>
+			  				</select>
+			  				<br>
+			  				<br>
+			  				Expense year
+				  			<select name = "expense_year">
+				    			{% for i in range(2016,2037) %}
+				        		<option value={{i}}>{{i}}</option>
+				    			{% endfor %}
+				  			</select>
+				  			<br>
+				  			<br>
+				  			<button type="submit" class="btn btn-lg btn-success">Create Expense</button>
+						</form>
+					</div>
+	            </div>
+
+	<!-- View expenses -->
+				<div class="panel panel-info" id = "newhome" style="display:block">
+					<div class="panel-heading">
+						<h3 class="panel-title">View Expense</h3>
+					</div>
+					<div class="panel-body">
+						<form action = "viewexpense" method="post">
+						Expense Month
+							<select name="expense_month" class="dropdown">
+			  					<ul class="dropdown-menu">
+			                		<li><option value="Jan">Jan</option></li>
+							      	<li><option value="Feb">Feb</option></li>
+							      	<option value="Mar">March</option>
+								    <option value="Apr">April</option>
+								    <option value="May">May</option>
+								    <option value="Jun">June</option>
+								    <option value="Jul">July</option>
+								    <option value="Agu">August</option>
+								    <option value="Sep">September</option>
+								    <option value="Oct">October</option>
+								    <option value="Nov">November</option>
+								    <option value="dec">December</option>
+			              		</ul>
+			  				</select>
+			  				<br>
+			  				<br>
+			  				Expense year
+				  			<select name = "expense_year">
+				    			{% for i in range(2016,2037) %}
+				        		<option value={{i}}>{{i}}</option>
+				    			{% endfor %}
+				  			</select>
+				  			<br>
+				  			<br>
+				  			<button type="submit" class="btn btn-lg btn-success">View Expense</button>
 						</form>
 					</div>
 	            </div>

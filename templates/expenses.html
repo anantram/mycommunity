@@ -102,34 +102,19 @@
 					<table class="table table-striped">
             		<thead>
               			<tr>
+                		<th>Detail</th>
                 		<th>Month</th>
                 		<th>Year</th>
-                		<th>Detail</th>
                 		<th>Amount</th>
-                		<th>Type</th>
-                		<th>Pay</th>
               			</tr>
             		</thead>
             		<tbody>
-            		{% for due in dues %}
-              			
+            		{% for expense in expenses %}
               			<tr>
-                		<form action = "paydue" method = "post">
-	                		<td>{{due.due_month}}</td>
-	                		<td>{{due.due_year}}</td>
-	                		<td>{{due.due_detail}}</td>
-	                		<td>{{due.due_amount}}</td>
-	                		<td>{{due.due_type}}</td>
-	                		<td> 
-	                			<input type="hidden" name="house_id" value ={{house_id}}>
-	                			<input type="hidden" name="due_month" value ={{due.due_month}}>
-		                		<input type="hidden" name="due_year" value ={{due.due_year}}>
-		                		<input type="hidden" name="due_detail" value ={{due.due_detail}}>
-		                		<input type="hidden" name="due_type" value ={{due.due_type}}>
-		                		<input type="hidden" name="due_amount" value ={{due.due_amount}}>
-		                		<button type="submit" class="btn btn-lg btn-success">Pay</button>
-	                		</td>
-                		</form>
+	                		<td>{{expense.expense_detail}}</td>
+	                		<td>{{expense.expense_month}}</td>
+	                		<td>{{expense.expense_year}}</td>
+	                		<td>{{expense.expense_amount}}</td>
               			</tr>
               		{% endfor %}
             		</tbody>
