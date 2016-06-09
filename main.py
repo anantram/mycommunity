@@ -70,6 +70,13 @@ class expensesdb(db.Model):
 	expense_detail = db.StringProperty()
 	expense_amount = db.IntegerProperty()
 
+class membersdb(db.Model):
+	house_id = db.StringProperty()
+	member_name = db.StringProperty()
+	member_DOB = db.StringProperty()
+	member_gender = db.StringProperty()
+
+
 
 # Fuctions
 
@@ -163,10 +170,11 @@ class commuser(MainHandler):
 		ownerlist = houseownerdb.all()
 		if house_exists:
 			for owner in ownerlist:
-				if owner.house_id == house_id:
-					self.response.headers.add_header('Set-Cookie', 'logged_house_owner = %s' % (str)(owner.house_owner))
-					self.response.headers.add_header('Set-Cookie', 'logged_house_contact = %s' % (str)(owner.house_contact))
-					break
+				if owner.house_comm_id == comm_id:
+					if owner.house_number == comm_house_number:
+						self.response.headers.add_header('Set-Cookie', 'logged_house_owner = %s' % (str)(owner.house_owner))
+						self.response.headers.add_header('Set-Cookie', 'logged_house_contact = %s' % (str)(owner.house_contact))
+						break
 			self.redirect("/loggeduser")
 		else:
 			self.redirect("/commlogin")
@@ -184,6 +192,7 @@ class newhome(MainHandler):
 
 		dbIn = housedb(house_number = comm_house_number, house_pass = comm_house_pass, house_comm_id = comm_id)  
 		dbIn.put()
+
 		dbIn = houseownerdb(house_number = comm_house_number, house_owner = comm_house_owner,
 			house_comm_id = comm_id, house_contact = comm_house_contact, house_status = True )  
 		dbIn.put()
@@ -214,19 +223,21 @@ class loggedadmin(MainHandler):
 
 class loggeduser(MainHandler):
 	def get(self):
-		house_id = self.request.cookies.get('logged_house_id')
+		
 		house_owner = self.request.cookies.get('logged_house_owner')
 		house_contact = self.request.cookies.get('logged_house_contact')
-
+		house_id = self.request.cookies.get('logged_house_id')
 		due_list = db.GqlQuery("select * from duesdb where house_id = '%(kwarg)s'" % {'kwarg':house_id})
 		dues = due_list.fetch(100)
 		payment_list = db.GqlQuery("select * from paymentsdb where house_id = '%(kwarg)s'" % {'kwarg':house_id})
 		payments = payment_list.fetch(100)
+		member_list = db.GqlQuery("select * from membersdb where house_id = '%(kwarg)s'" % {'kwarg':house_id})
+		members = member_list.fetch(100)
 		totaldue = 0
 		for due in dues:
 			totaldue = totaldue + due.due_amount
 		self.render("userdash.html", dues = dues, payments = payments, totaldue = totaldue, houseowner = house_owner,
-			housecontact = house_contact)
+			housecontact = house_contact, members = members)
 
 class newMonth(MainHandler):
 	def post(self):
@@ -298,6 +309,16 @@ class viewexpense(MainHandler):
 		expenses = expense_list.fetch(100)
 		self.render("expenses.html", expenses = expenses)
 
+class newmember(MainHandler):
+	def post(self):
+		member_name = self.request.get("member_name")
+		member_gender = self.request.get("member_gender")
+		member_DOB = self.request.get("member_DOB")
+		house_id = self.request.cookies.get('logged_house_id')
+		dbIn = membersdb(member_name = member_name, member_gender = member_gender, member_DOB = member_DOB,
+			house_id = house_id)
+		dbIn.put()
+		self.redirect("/loggeduser")
 
 
 class paydue(MainHandler):
@@ -347,5 +368,6 @@ app = webapp2.WSGIApplication([
     ('/due',dues),
     ('/paydue',paydue),
     ('/newexpense', newexpense),
-    ('/viewexpense', viewexpense)
+    ('/viewexpense', viewexpense),
+    ('/newmember', newmember)
 ], debug=True)

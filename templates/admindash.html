@@ -62,15 +62,11 @@
 						<li class="active"></li>
 						<li><a onclick ="newhome()">New House</a></li>
 						<li><a onclick="newcollection()">New Collection</a></li>
-						<li class="dropdown"><a href="http://getbootstrap.com/examples/theme/#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account <span class="caret"></span></a>
+						<li class="dropdown"><a href="http://getbootstrap.com/examples/theme/#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Accounts <span class="caret"></span></a>
 							<ul class="dropdown-menu">
 								<li><a onclick="dues()">Dues</a></li>
-								<li><a href="http://getbootstrap.com/examples/theme/#">Another action</a></li>
-								<li><a href="http://getbootstrap.com/examples/theme/#">Something else here</a></li>
-								<li role="separator" class="divider"></li>
-								<li class="dropdown-header">Nav header</li>
-								<li><a href="http://getbootstrap.com/examples/theme/#">Separated link</a></li>
-								<li><a href="http://getbootstrap.com/examples/theme/#">One more separated link</a></li>
+								<li><a onclick="newexpense()">New Expense</a></li>
+								<li><a onclick="viewexpense()">View Expense</a></li>
 							</ul>
 						</li>
 					</ul>
@@ -83,9 +79,7 @@
 									<div class="navbar-content">
 										<div class="row">
 											<div class="col-md-7">
-												<span>Bhaumik Patel</span>
-												<p class="text-muted small">
-														mail@gmail.com</p>
+												<span>{{comm_name}}</span>
 												<div class="divider">
 												</div>
 											</div>
@@ -95,7 +89,6 @@
 										<div class="navbar-footer-content">
 											<div class="row">
 												<div class="col-md-6">
-													<a href="#" class="btn btn-default btn-sm">Change Passowrd</a>
 												</div>
 												<div class="col-md-6">
 													<a href="logout" class="btn btn-default btn-sm pull-right">Sign Out</a>
@@ -139,6 +132,12 @@
 						<h3 class="panel-title">Amount left</h3>
 					</div>
 					<div class="panel-body">
+					{% if amountleft < 0 %}
+					Credit
+					{% else %}
+					Debit
+					{% endif %}
+					<br>
 							Rs: {{amountleft}} /-
 					</div>
 				</div>
@@ -154,8 +153,8 @@
 						<form action = "newmonth" method="post">
 		  					<select name="month" class="dropdown">
 			  					<ul class="dropdown-menu">
-			                		<li><option value="Jan">Jan</option></li>
-							      	<li><option value="Feb">Feb</option></li>
+			                		<option value="Jan">Jan</option></li>
+							      	<option value="Feb">Feb</option></li>
 							      	<option value="Mar">March</option>
 								    <option value="Apr">April</option>
 								    <option value="May">May</option>
@@ -233,7 +232,7 @@
 					</div>
 	            </div>
 	<!-- New Expense -->
-				<div class="panel panel-info" id = "newhome" style="display:block">
+				<div class="panel panel-info" id = "newexpense" style="display:none">
 					<div class="panel-heading">
 						<h3 class="panel-title">New Expense</h3>
 					</div>
@@ -280,7 +279,7 @@
 	            </div>
 
 	<!-- View expenses -->
-				<div class="panel panel-info" id = "newhome" style="display:block">
+				<div class="panel panel-info" id = "viewexpense" style="display:none">
 					<div class="panel-heading">
 						<h3 class="panel-title">View Expense</h3>
 					</div>
@@ -319,33 +318,41 @@
 	            </div>
 			</div>
 <!-- Owners -->
-			<div class="col-md-6" id = "ownerslist">
-          		<table class="table table-striped">
-            		<thead>
-              			<tr>
-                		<th>House Number</th>
-                		<th>House Owner</th>
-                		<th>Contact</th>
-                		<th>Status</th>
-              			</tr>
-            		</thead>
-            		<tbody>
-            		{% for house in houses %}
-              			<tr>
-                		<td>{{house.house_number}}</td>
-                		<td>{{house.house_owner}}</td>
-                		<td>{{house.house_contact}}</td>
-            			{% if house.house_status %}
-                		<td>Occupied</td>
-                		{% else %}
-                		<td>Unoccupied</td>
-                		{% endif %}
-              			</tr>
-              		{% endfor %}
-            		</tbody>
-          	</table>
-        </div>
 
+			<div class="col-md-6" id = "ownerslist">	
+				<div class="panel panel-info" id = "newcollection">
+					<div class="panel-heading">
+						<h3 class="panel-title">Colony Members</h3>
+					</div>
+					<div class="panel-body">
+		          		<table class="table">
+		            		<thead>
+		              			<tr>
+		                		<th>House Number</th>
+		                		<th>House Owner</th>
+		                		<th>Contact</th>
+		                		<th>Status</th>
+		              			</tr>
+		            		</thead>
+		            		<tbody>
+		            		{% for house in houses %}
+		              			<tr>
+		                		<td>{{house.house_number}}</td>
+		                		<td>{{house.house_owner}}</td>
+		                		<td>{{house.house_contact}}</td>
+		            			{% if house.house_status %}
+		                		<td>Occupied</td>
+		                		{% else %}
+		                		<td>Unoccupied</td>
+		                		{% endif %}
+		              			</tr>
+		              		{% endfor %}
+		            		</tbody>
+		          		</table>
+		          	</div>
+		        </div>
+        	</div>
+		</div>
 		
 		<!-- Scripts -->
 		<script type="text/javascript">
@@ -354,6 +361,8 @@
         		document.getElementById('newcollection').style.display = "none";
         		document.getElementById('newhome').style.display = "none";
         		document.getElementById('ownerslist').style.display = "none";
+        		document.getElementById('newexpense').style.display = "none";
+        		document.getElementById('viewexpense').style.display = "none";
         		document.getElementById('functioncolomn').style.display = "block";
 
     		}
@@ -362,6 +371,8 @@
         		document.getElementById('newcollection').style.display = "block";
         		document.getElementById('newhome').style.display = "none";
         		document.getElementById('ownerslist').style.display = "none";
+        		document.getElementById('newexpense').style.display = "none";
+        		document.getElementById('viewexpense').style.display = "none";
         		document.getElementById('functioncolomn').style.display = "block";
     		}
 
@@ -370,6 +381,28 @@
         		document.getElementById('newcollection').style.display = "none";
         		document.getElementById('newhome').style.display = "block";
         		document.getElementById('ownerslist').style.display = "none";
+        		document.getElementById('newexpense').style.display = "none";
+        		document.getElementById('viewexpense').style.display = "none";
+        		document.getElementById('functioncolomn').style.display = "block";
+    		}
+
+    		function newexpense() {
+        		document.getElementById('dues').style.display = "none";
+        		document.getElementById('newcollection').style.display = "none";
+        		document.getElementById('newhome').style.display = "none";
+        		document.getElementById('ownerslist').style.display = "none";
+        		document.getElementById('newexpense').style.display = "block";
+        		document.getElementById('viewexpense').style.display = "none";
+        		document.getElementById('functioncolomn').style.display = "block";
+    		}
+
+    		function viewexpense() {
+        		document.getElementById('dues').style.display = "none";
+        		document.getElementById('newcollection').style.display = "none";
+        		document.getElementById('newhome').style.display = "none";
+        		document.getElementById('ownerslist').style.display = "none";
+        		document.getElementById('newexpense').style.display = "none";
+        		document.getElementById('viewexpense').style.display = "block";
         		document.getElementById('functioncolomn').style.display = "block";
     		}
 		</script>

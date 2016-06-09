@@ -59,7 +59,7 @@
 				</div>
 				<div id="navbar" class="navbar-collapse collapse">
 					<ul class="nav navbar-nav">
-						<li class="active"><a href="mynetwork-1313.appsport.com">My Neighbours</a></li>
+						<li><a href="mynetwork-1313.appsport.com">My Neighbours</a></li>
 						<li><a href="http://getbootstrap.com/examples/theme/#about">My Payments</a></li>
 						<li><a href="http://getbootstrap.com/examples/theme/#contact">My Dues</a></li>
 						<li class="dropdown"><a href="http://getbootstrap.com/examples/theme/#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
@@ -110,6 +110,7 @@
 				</div>
 			</div>
 		</nav>
+
 		<div class="page-header">
 			<h1>Family Details</h1>
 		</div>
@@ -140,7 +141,8 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-6">
+			
+			<div class="col-md-6" style="display:block">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
 						<h3 class="panel-title">Dues</h3>
@@ -173,7 +175,7 @@
 					</div>
 				</div>
 <!-- payments -->
-				<div class="panel panel-primary">
+				<div class="panel panel-primary" style="display:block">
 					<div class="panel-heading">
 						<h3 class="panel-title">Payments</h3>
 					</div>
@@ -205,7 +207,65 @@
 						</div>
 					</div>
 				</div>
+
+				<div class="panel panel-primary" style="display:block">
+					<div class="panel-heading">
+						<h3 class="panel-title">Members</h3>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<table class="table">
+								<thead>
+									<tr>
+										<td>Name</td>
+										<td>DOB</td>
+										<td>Gender</td>
+									</tr>
+								</thead>
+								<tbody>
+								{% for member in members %}
+									<tr>
+									<td>{{member.member_name}}</td>
+									<td>{{member.member_DOB}}</td>
+									<td>{{member.member_gender}}</td>
+									</tr>
+								{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
 			</div>
+			<div class="col-sm-4" style="display:block"  id = "functioncolomn">
+				<div class="panel panel-info" id = "newhome" style="display:block">
+					<div class="panel-heading">
+						<h3 class="panel-title">Add Member</h3>
+					</div>
+					<div class="panel-body">
+						<form action = "newmember" method="post">
+						Member Name
+							<input type="text" name="member_name">
+							<br>
+							<br>
+						Member DOB
+							<input type="text" name="member_DOB">
+							<br>
+							<br>
+						Member Gender
+							<select name="member_gender" class="dropdown">
+			  					<ul class="dropdown-menu">
+			                		<option value="male">Male</option>
+			                		<option value="female">Female</option>
+			                		<option value="female">Others</option>
+			                	</ul>
+			                </select>
+							<br>
+							<br>
+							<button type="submit" class="btn btn-lg btn-success">Add Member</button> 	
+						</form>
+					</div>
+		        </div>
+		   	</div>
 		</div>
 	</body>
 </html>
