@@ -67,6 +67,7 @@
 								<li><a onclick="dues()">Dues</a></li>
 								<li><a onclick="newexpense()">New Expense</a></li>
 								<li><a onclick="viewexpense()">View Expense</a></li>
+								<li><a onclick="changestatus()">Change Status</a></li>
 							</ul>
 						</li>
 					</ul>
@@ -89,6 +90,7 @@
 										<div class="navbar-footer-content">
 											<div class="row">
 												<div class="col-md-6">
+												<a onclick="editpassword()" class="btn btn-default btn-sm pull-right">Edit Password</a>
 												</div>
 												<div class="col-md-6">
 													<a href="logout" class="btn btn-default btn-sm pull-right">Sign Out</a>
@@ -132,10 +134,10 @@
 						<h3 class="panel-title">Amount left</h3>
 					</div>
 					<div class="panel-body">
-					{% if amountleft < 0 %}
-					Credit
-					{% else %}
+					{% if accountstatus %}
 					Debit
+					{% else %}
+					Credit
 					{% endif %}
 					<br>
 							Rs: {{amountleft}} /-
@@ -205,6 +207,24 @@
   						</form>
 					</div>
 	            </div>
+	<!-- Change Status -->
+				<div class="panel panel-info" id = "changestatus" style="display:block">
+					<div class="panel-heading">
+						<h3 class="panel-title">Change Status</h3>
+					</div>
+					<div class="panel-body">
+						<form action = "changestatus" method="post"> 
+  							<select name = "house_number" id = "house_id" onclick="populatedues()">
+    							{% for house in houses1 %}
+        						<option value={{house.house_number}}>{{house.house_number}}</option>
+    							{% endfor %}
+  							</select>
+  							<button type="submit" class="btn btn-lg btn-success">change status</button>
+
+  						</form>
+					</div>
+	            </div>
+
 	<!-- new house -->
 	            <div class="panel panel-info" id = "newhome" style="display:none">
 					<div class="panel-heading">
@@ -231,6 +251,30 @@
 						</form>
 					</div>
 	            </div>
+	<!-- Edit password -->
+				<div class="panel panel-info" id = "editpassword" style="display:block">
+					<div class="panel-heading">
+						<h3 class="panel-title">Edit Password</h3>
+					</div>
+					<div class="panel-body">
+						<form action = "editpassword" method="post">
+						Current Password
+							<input type="text" name="current_password">
+							<br>
+							<br>
+						New Password
+							<input type="text" name="new_password">
+							<br>
+							<br>
+						Re enter Password
+							<input type="text" name="reenter_password">
+							<br>
+							<br>
+							<button type="submit" class="btn btn-lg btn-success">Edit Password</button> 	
+						</form>
+					</div>
+	            </div>
+
 	<!-- New Expense -->
 				<div class="panel panel-info" id = "newexpense" style="display:none">
 					<div class="panel-heading">
@@ -320,7 +364,7 @@
 <!-- Owners -->
 
 			<div class="col-md-6" id = "ownerslist">	
-				<div class="panel panel-info" id = "newcollection">
+				<div class="panel panel-info" id = "owners">
 					<div class="panel-heading">
 						<h3 class="panel-title">Colony Members</h3>
 					</div>
@@ -363,6 +407,9 @@
         		document.getElementById('ownerslist').style.display = "none";
         		document.getElementById('newexpense').style.display = "none";
         		document.getElementById('viewexpense').style.display = "none";
+        		document.getElementById('changestatus').style.display = "none";
+        		document.getElementById('editpassword').style.display = "none";
+
         		document.getElementById('functioncolomn').style.display = "block";
 
     		}
@@ -373,6 +420,8 @@
         		document.getElementById('ownerslist').style.display = "none";
         		document.getElementById('newexpense').style.display = "none";
         		document.getElementById('viewexpense').style.display = "none";
+        		document.getElementById('changestatus').style.display = "none";
+        		document.getElementById('editpassword').style.display = "none";
         		document.getElementById('functioncolomn').style.display = "block";
     		}
 
@@ -383,6 +432,8 @@
         		document.getElementById('ownerslist').style.display = "none";
         		document.getElementById('newexpense').style.display = "none";
         		document.getElementById('viewexpense').style.display = "none";
+        		document.getElementById('changestatus').style.display = "none";
+        		document.getElementById('editpassword').style.display = "none";
         		document.getElementById('functioncolomn').style.display = "block";
     		}
 
@@ -393,6 +444,8 @@
         		document.getElementById('ownerslist').style.display = "none";
         		document.getElementById('newexpense').style.display = "block";
         		document.getElementById('viewexpense').style.display = "none";
+        		document.getElementById('changestatus').style.display = "none";
+        		document.getElementById('editpassword').style.display = "none";
         		document.getElementById('functioncolomn').style.display = "block";
     		}
 
@@ -403,6 +456,31 @@
         		document.getElementById('ownerslist').style.display = "none";
         		document.getElementById('newexpense').style.display = "none";
         		document.getElementById('viewexpense').style.display = "block";
+        		document.getElementById('changestatus').style.display = "none";
+        		document.getElementById('editpassword').style.display = "none";
+        		document.getElementById('functioncolomn').style.display = "block";
+    		}
+
+    		function changestatus() {
+        		document.getElementById('dues').style.display = "none";
+        		document.getElementById('newcollection').style.display = "none";
+        		document.getElementById('newhome').style.display = "none";
+        		document.getElementById('ownerslist').style.display = "none";
+        		document.getElementById('newexpense').style.display = "none";
+        		document.getElementById('viewexpense').style.display = "none";
+        		document.getElementById('changestatus').style.display = "block";
+        		document.getElementById('editpassword').style.display = "none";
+        		document.getElementById('functioncolomn').style.display = "block";
+    		}
+    		function editpassword() {
+        		document.getElementById('dues').style.display = "none";
+        		document.getElementById('newcollection').style.display = "none";
+        		document.getElementById('newhome').style.display = "none";
+        		document.getElementById('ownerslist').style.display = "none";
+        		document.getElementById('newexpense').style.display = "none";
+        		document.getElementById('viewexpense').style.display = "none";
+        		document.getElementById('changestatus').style.display = "none";
+        		document.getElementById('editpassword').style.display = "block";
         		document.getElementById('functioncolomn').style.display = "block";
     		}
 		</script>

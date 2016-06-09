@@ -14,3 +14,8 @@ indexes:
   properties:
   - name: house_id
   - name: due_created
+
+- kind: houseownerdb
+  properties:
+  - name: house_comm_id
+  - name: house_number

@@ -148,7 +148,7 @@ class commadmin(MainHandler):
 		if community_exists:
 			self.redirect("/loggedadmin")
 		else:
-			self.redirect("/commlogin")
+			self.redirect("/community")
 
 class commuser(MainHandler):
 	def post(self):
@@ -177,7 +177,7 @@ class commuser(MainHandler):
 						break
 			self.redirect("/loggeduser")
 		else:
-			self.redirect("/commlogin")
+			self.redirect("/community")
 
 class newhome(MainHandler):
 	def get(self):
@@ -216,10 +216,16 @@ class loggedadmin(MainHandler):
 			collection = collection + payment.payment_amount
 		for expense in expenses:
 			totalexpense = totalexpense + expense.expense_amount
-		amountleft = collection - totalexpense
+		accountstatus = False
+
+		if collection >= totalexpense:
+			amountleft = collection - totalexpense
+			accountstatus = True
+		else:
+			amountleft = totalexpense - collection
 
 
-		self.render("admindash.html", houses = houses, comm_name = comm_name, houses1 = houses1, amountleft = amountleft)
+		self.render("admindash.html", houses = houses, comm_name = comm_name, houses1 = houses1, amountleft = amountleft, accountstatus = accountstatus)
 
 class loggeduser(MainHandler):
 	def get(self):
@@ -227,17 +233,21 @@ class loggeduser(MainHandler):
 		house_owner = self.request.cookies.get('logged_house_owner')
 		house_contact = self.request.cookies.get('logged_house_contact')
 		house_id = self.request.cookies.get('logged_house_id')
+		community_id = self.request.cookies.get('logged_community_id')
+		house_name = self.request.cookies.get('logged_house_name')
 		due_list = db.GqlQuery("select * from duesdb where house_id = '%(kwarg)s'" % {'kwarg':house_id})
 		dues = due_list.fetch(100)
 		payment_list = db.GqlQuery("select * from paymentsdb where house_id = '%(kwarg)s'" % {'kwarg':house_id})
 		payments = payment_list.fetch(100)
 		member_list = db.GqlQuery("select * from membersdb where house_id = '%(kwarg)s'" % {'kwarg':house_id})
 		members = member_list.fetch(100)
+		neighbour_list = db.GqlQuery("select * from houseownerdb where house_comm_id = '%(kwarg)s' and house_number != '%(housename)s'" % {'kwarg':community_id,'housename':house_name})
+		neighbours = neighbour_list.fetch(100)
 		totaldue = 0
 		for due in dues:
 			totaldue = totaldue + due.due_amount
 		self.render("userdash.html", dues = dues, payments = payments, totaldue = totaldue, houseowner = house_owner,
-			housecontact = house_contact, members = members)
+			housecontact = house_contact, members = members, neighbours = neighbours)
 
 class newMonth(MainHandler):
 	def post(self):
@@ -354,6 +364,67 @@ class paydue(MainHandler):
 	
 		self.redirect('/loggedadmin')
 
+class editpassword(MainHandler):
+	def post (self):
+		community_id = self.request.cookies.get('logged_community_id')
+		current_password = self.request.get("current_password")
+		new_password = self.request.get("new_password")
+		reenter_password = self.request.get("reenter_password")
+		if new_password == reenter_password:
+			communities = communitydb.all()
+			for community in communities:
+				if (str)(community.key()) == community_id:
+					community.community_pass = new_password
+					community.put()
+					break
+		self.redirect("/loggedadmin")
+
+class editpassworduser(MainHandler):
+	def post (self):
+		house_id = self.request.cookies.get('logged_house_id')
+		current_password = self.request.get("current_password")
+		new_password = self.request.get("new_password")
+		reenter_password = self.request.get("reenter_password")
+		if new_password == reenter_password:
+			houses = housedb.all()
+			for house in houses:
+				if (str)(house.key()) == house_id:
+					house.house_pass = new_password
+					house.put()
+					break
+		self.redirect("/loggedadmin")
+
+class changestatus(MainHandler):
+	def post(self):
+		community_id = self.request.cookies.get('logged_community_id')
+		house_number = self.request.get("house_number")
+		house_id = ""
+		houses = housedb.all()
+		for house in houses:
+			if house.house_number == house_number:
+				if house.house_comm_id == community_id:
+					house_id = (str)(house.key())
+					house.house_pass = "0000"
+					house.put()
+					break
+
+		owners = houseownerdb.all()
+		for owner in owners:
+			if owner.house_comm_id == community_id:
+				if owner.house_number == house_number:
+					if owner.house_status:
+						owner.house_status = False
+						dbIn = db.GqlQuery("select * from membersdb where house_id = '%(name)s'" % {'name':house_id})
+						members = dbIn.fetch(100) 
+						for member in members:
+							member.delete()
+					else:
+						owner.house_status = True
+					owner.put()
+					break
+		self.redirect("/loggedadmin")
+
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/commlogin', commlogin),
@@ -369,5 +440,8 @@ app = webapp2.WSGIApplication([
     ('/paydue',paydue),
     ('/newexpense', newexpense),
     ('/viewexpense', viewexpense),
-    ('/newmember', newmember)
+    ('/newmember', newmember),
+    ('/editpassword', editpassword),
+    ('/editpassworduser', editpassworduser),
+    ('/changestatus', changestatus)
 ], debug=True)

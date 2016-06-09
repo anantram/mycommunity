@@ -55,24 +55,14 @@
 		<nav class="navbar navbar-inverse navbar-fixed-top">
 			<div class="container">
 				<div class="navbar-header">
-					<a class="navbar-brand">Zeenat</a>
+					<a class="navbar-brand" href="/loggeduser">Zeenat</a>
 				</div>
 				<div id="navbar" class="navbar-collapse collapse">
 					<ul class="nav navbar-nav">
-						<li><a href="mynetwork-1313.appsport.com">My Neighbours</a></li>
-						<li><a href="http://getbootstrap.com/examples/theme/#about">My Payments</a></li>
-						<li><a href="http://getbootstrap.com/examples/theme/#contact">My Dues</a></li>
-						<li class="dropdown"><a href="http://getbootstrap.com/examples/theme/#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-							<ul class="dropdown-menu">
-								<li><a href="http://getbootstrap.com/examples/theme/#">Action</a></li>
-								<li><a href="http://getbootstrap.com/examples/theme/#">Another action</a></li>
-								<li><a href="http://getbootstrap.com/examples/theme/#">Something else here</a></li>
-								<li role="separator" class="divider"></li>
-								<li class="dropdown-header">Nav header</li>
-								<li><a href="http://getbootstrap.com/examples/theme/#">Separated link</a></li>
-								<li><a href="http://getbootstrap.com/examples/theme/#">One more separated link</a></li>
-							</ul>
-						</li>
+						<li><a onclick="myneighbours()" ">My Neighbours</a></li>
+						<li><a onclick="mypayments()" ">My Payments</a></li>
+						<li><a onclick="mydues()" ">My Dues</a></li>
+						<li><a onclick="addmember()" ">Add Member</a></li>	
 					</ul>
 
 					<ul class="nav navbar-nav navbar-right">
@@ -95,7 +85,7 @@
 										<div class="navbar-footer-content">
 											<div class="row">
 												<div class="col-md-6">
-													<a href="#" class="btn btn-default btn-sm">Change Passowrd</a>
+													<a onclick="editpassword()" class="btn btn-default btn-sm">Change Passowrd</a>
 												</div>
 												<div class="col-md-6">
 													<a href="/logout" class="btn btn-default btn-sm pull-right">Sign Out</a>
@@ -141,9 +131,9 @@
 					</div>
 				</div>
 			</div>
-			
-			<div class="col-md-6" style="display:block">
-				<div class="panel panel-primary">
+	<!-- Dues -->
+			<div class="col-md-6" style="display:block" id = "functioncoloumn">
+				<div class="panel panel-primary"  id = "dues" style="display:none">
 					<div class="panel-heading">
 						<h3 class="panel-title">Dues</h3>
 					</div>
@@ -175,7 +165,7 @@
 					</div>
 				</div>
 <!-- payments -->
-				<div class="panel panel-primary" style="display:block">
+				<div class="panel panel-primary" style="display:none" id = "payments">
 					<div class="panel-heading">
 						<h3 class="panel-title">Payments</h3>
 					</div>
@@ -208,7 +198,32 @@
 					</div>
 				</div>
 
-				<div class="panel panel-primary" style="display:block">
+<!-- Edit password -->
+				<div class="panel panel-info" id = "editpassword" style="display:none">
+					<div class="panel-heading">
+						<h3 class="panel-title">Edit Password</h3>
+					</div>
+					<div class="panel-body">
+						<form action = "editpassworduser" method="post">
+						Current Password
+							<input type="text" name="current_password">
+							<br>
+							<br>
+						New Password
+							<input type="text" name="new_password">
+							<br>
+							<br>
+						Re enter Password
+							<input type="text" name="reenter_password">
+							<br>
+							<br>
+							<button type="submit" class="btn btn-lg btn-success">Edit Password</button> 	
+						</form>
+					</div>
+	            </div>
+
+<!-- Members -->
+				<div class="panel panel-primary" style="display:block" id = "members">
 					<div class="panel-heading">
 						<h3 class="panel-title">Members</h3>
 					</div>
@@ -235,9 +250,45 @@
 						</div>
 					</div>
 				</div>
+<!-- Neighbours -->
+
+				<div class="panel panel-primary" style="display:none" id = "neighbours">
+					<div class="panel-heading">
+						<h3 class="panel-title">Neighbours</h3>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<table class="table">
+								<thead>
+			              			<tr>
+			                		<th>House Number</th>
+			                		<th>House Owner</th>
+			                		<th>Contact</th>
+			                		<th>Status</th>
+			              			</tr>
+		            			</thead>
+		            			<tbody>
+		            			{% for neighbour in neighbours %}
+			              			<tr>
+			                		<td>{{neighbour.house_number}}</td>
+			                		<td>{{neighbour.house_owner}}</td>
+			                		<td>{{neighbour.house_contact}}</td>
+			            			{% if neighbour.house_status %}
+			                		<td>Occupied</td>
+			                		{% else %}
+			                		<td>Unoccupied</td>
+		                			{% endif %}
+		              				</tr>
+		              			{% endfor %}
+		            			</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
 			</div>
-			<div class="col-sm-4" style="display:block"  id = "functioncolomn">
-				<div class="panel panel-info" id = "newhome" style="display:block">
+	<!-- add member -->
+			<div class="col-sm-4" style="display:none"  id = "memcoloumn">
+				<div class="panel panel-info" id = "addmember" style="display:none">
 					<div class="panel-heading">
 						<h3 class="panel-title">Add Member</h3>
 					</div>
@@ -267,5 +318,62 @@
 		        </div>
 		   	</div>
 		</div>
+		<script type="text/javascript">
+			
+			function mydues() {
+        		document.getElementById('dues').style.display = "block";
+        		document.getElementById('payments').style.display = "none";
+        		document.getElementById('editpassword').style.display = "none";
+        		document.getElementById('members').style.display = "none";
+        		document.getElementById('neighbours').style.display = "none";
+        		document.getElementById('addmember').style.display = "none";
+        		document.getElementById('memcoloumn').style.display = "none";
+        		document.getElementById('functioncoloumn').style.display = "block";
+    		}
+
+    		function mypayments() {
+        		document.getElementById('dues').style.display = "none";
+        		document.getElementById('payments').style.display = "block";
+        		document.getElementById('editpassword').style.display = "none";
+        		document.getElementById('members').style.display = "none";
+        		document.getElementById('neighbours').style.display = "none";
+        		document.getElementById('addmember').style.display = "none";
+        		document.getElementById('memcoloumn').style.display = "none";
+        		document.getElementById('functioncoloumn').style.display = "block";
+    		}
+
+    		function myneighbours() {
+        		document.getElementById('dues').style.display = "none";
+        		document.getElementById('payments').style.display = "none";
+        		document.getElementById('editpassword').style.display = "none";
+        		document.getElementById('members').style.display = "none";
+        		document.getElementById('neighbours').style.display = "block";
+        		document.getElementById('addmember').style.display = "none";
+        		document.getElementById('memcoloumn').style.display = "none";
+        		document.getElementById('functioncoloumn').style.display = "block";
+    		}
+
+    		function editpassword() {
+        		document.getElementById('dues').style.display = "none";
+        		document.getElementById('payments').style.display = "none";
+        		document.getElementById('editpassword').style.display = "block";
+        		document.getElementById('members').style.display = "none";
+        		document.getElementById('neighbours').style.display = "none";
+        		document.getElementById('addmember').style.display = "none";
+        		document.getElementById('memcoloumn').style.display = "none";
+        		document.getElementById('functioncoloumn').style.display = "block";
+    		}
+
+    		function addmember() {
+        		document.getElementById('dues').style.display = "none";
+        		document.getElementById('payments').style.display = "none";
+        		document.getElementById('editpassword').style.display = "none";
+        		document.getElementById('members').style.display = "none";
+        		document.getElementById('neighbours').style.display = "none";
+        		document.getElementById('addmember').style.display = "block";
+        		document.getElementById('memcoloumn').style.display = "block";
+        		document.getElementById('functioncoloumn').style.display = "none";
+    		}
+		</script>
 	</body>
 </html>
