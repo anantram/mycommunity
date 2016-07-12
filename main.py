@@ -21,6 +21,10 @@ import time
 import datetime
 
 from google.appengine.ext import db
+
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+
 template_dir = os.path.join(os.path.dirname(__file__),'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape = True)
 
@@ -76,6 +80,17 @@ class membersdb(db.Model):
 	member_DOB = db.StringProperty()
 	member_gender = db.StringProperty()
 
+# pdf creation
+
+class PDFHandler(webapp2.RequestHandler):
+  def get(self):
+    self.response.headers['Content-Type'] = 'application/pdf'
+    self.response.headers['Content-Disposition'] = 'attachment; filename=my.pdf'
+    payment_id = self.request.get("paymentid")
+    c = canvas.Canvas(self.response.out, pagesize=A4)
+    c.drawString(100, 100, paymentid)
+    c.showPage()
+    c.save()
 
 
 # Fuctions
@@ -340,6 +355,7 @@ class paydue(MainHandler):
 		due_detail = self.request.get("due_detail")
 		due_type = self.request.get("due_type")
 		comm_id = self.request.cookies.get('logged_community_id')
+		comm_name = self.request.cookies.get('logged_community_name')
 		current_time = datetime.datetime.now()
 		dues = duesdb.all()
 		due_found = False
@@ -361,8 +377,30 @@ class paydue(MainHandler):
 				payment_type = due_type, payment_detail = due_detail, house_id = house_id, payment_created = current_time,
 				community_id = comm_id)
 			dbIn.put()
-	
-		self.redirect('/loggedadmin')
+
+		self.response.headers['Content-Type'] = 'application/pdf'
+		self.response.headers['Content-Disposition'] = 'attachment; filename=receipt.pdf'
+		c = canvas.Canvas(self.response.out, pagesize=A4)
+		c.drawString(100, 750, house_id)
+
+		c.drawString(200, 700, "Month")
+		c.drawString(200, 600, "Year")
+		c.drawString(200, 500, "Amount")
+		c.drawString(200, 400, "Paid On")
+
+		c.drawString(200, 650, "--------------------------------------------------")
+		c.drawString(200, 550, "--------------------------------------------------")
+		c.drawString(200, 450, "--------------------------------------------------")
+
+
+		c.drawString(200, 800, comm_name)
+		c.drawString(400, 700, due_month)
+		c.drawString(400, 600, due_year)
+		c.drawString(400, 500, due_amount)
+		c.drawString(400, 400, (str)(current_time.date()))
+		c.showPage()
+		c.save()
+		# self.redirect('/loggedadmin')
 
 class editpassword(MainHandler):
 	def post (self):
@@ -443,5 +481,6 @@ app = webapp2.WSGIApplication([
     ('/newmember', newmember),
     ('/editpassword', editpassword),
     ('/editpassworduser', editpassworduser),
-    ('/changestatus', changestatus)
+    ('/changestatus', changestatus),
+    ('/test', PDFHandler)
 ], debug=True)
