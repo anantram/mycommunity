@@ -44,7 +44,7 @@ form.login input[type="text"], form.login input[type="password"]
 {
     width: 100%;
     margin: 0;
-    padding: 5px 10px;
+    padding: 15px 10px;
     background: 0;
     border: 0;
     border-bottom: 1px solid #FFFFFF;

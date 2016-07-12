@@ -19,9 +19,9 @@ import os
 import jinja2
 import time
 import datetime
+import re
 
 from google.appengine.ext import db
-
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 
@@ -79,18 +79,9 @@ class membersdb(db.Model):
 	member_name = db.StringProperty()
 	member_DOB = db.StringProperty()
 	member_gender = db.StringProperty()
+	member_contact =db.StringProperty()
+	member_occupation = db.StringProperty()
 
-# pdf creation
-
-class PDFHandler(webapp2.RequestHandler):
-  def get(self):
-    self.response.headers['Content-Type'] = 'application/pdf'
-    self.response.headers['Content-Disposition'] = 'attachment; filename=my.pdf'
-    payment_id = self.request.get("paymentid")
-    c = canvas.Canvas(self.response.out, pagesize=A4)
-    c.drawString(100, 100, paymentid)
-    c.showPage()
-    c.save()
 
 
 # Fuctions
@@ -115,34 +106,47 @@ class MainHandler(webapp2.RequestHandler):
 	comm_pass2 = self.request.get("comm_pass2")
 	community_exists = False
 	communitylist = communitydb.all()
-	if comm_pass1 == comm_pass2:
-		for community in communitylist:
-			if community.community_name == comm_name:
-				community_exists = True
-		if community_exists:
-			self.render("Welcome.html", error = "Community exits")
+	USER_RE = re.compile(r"^[a-zA-Z_]{5,20}$")
+	PASS_RE = re.compile(r"^[a-zA-Z0-9_]{8,20}$")
+	input1 = comm_name
+	if USER_RE.match(input1):
+		if PASS_RE.match(comm_pass1):
+			if comm_pass1 == comm_pass2:
+				for community in communitylist:
+					if community.community_name == comm_name:
+						community_exists = True
+				if community_exists:
+					self.render("Welcome.html", error = "Community exits")
+				else:
+					dbIn = communitydb(community_name = comm_name,community_pass = comm_pass1)
+					dbIn.put()
+					self.redirect("/")
+			else:
+				self.render("welcome.html", error = "password missmatched")
 		else:
-			dbIn = communitydb(community_name = comm_name,community_pass = comm_pass1)
-			dbIn.put()
-			self.redirect("/")
+			self.render("welcome.html",error ="enter correct format")		
 	else:
-		self.render("welcome.html", error = "password missmatched")
+		self.render("welcome.html", error = "invalid name")		
 
 class commlogin(MainHandler):
 	def post(self):
 		comm_name = self.request.get("comm_name")
 		communitylist = communitydb.all()
 		community_exists = False;
-		for community in communitylist:
-			if community.community_name == comm_name:
-				community_exists = True
-				self.response.headers.add_header('Set-Cookie', 'logged_community_id = %s' % (str)(community.key()))
-				self.response.headers.add_header('Set-Cookie', 'logged_community_name = %s' % (str)(community.community_name))
-				break
-		if community_exists:
-			self.redirect("/community")
+		USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
+		if USER_RE.match(comm_name):
+			for community in communitylist:
+				if community.community_name == comm_name:
+					community_exists = True
+					self.response.headers.add_header('Set-Cookie', 'logged_community_id = %s' % (str)(community.key()))
+					self.response.headers.add_header('Set-Cookie', 'logged_community_name = %s' % (str)(community.community_name))
+					break
+			if community_exists:
+				self.redirect("/community")
+			else:
+				self.redirect("/")
 		else:
-			self.redirect("/")
+			self.redirect("/")		
 
 class community(MainHandler):
 	def get(self):
@@ -173,6 +177,8 @@ class commuser(MainHandler):
 		house_id = ""
 		houselist = housedb.all()
 		house_exists = False;
+		USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
+		PASS_RE = re.compile(r"^.{3,20}$")
 		for house in houselist:
 			if house.house_comm_id == comm_id:
 				if house.house_number == comm_house_number:
@@ -182,6 +188,7 @@ class commuser(MainHandler):
 						self.response.headers.add_header('Set-Cookie', 'logged_house_id = %s' % (str)(house.key()))
 						self.response.headers.add_header('Set-Cookie', 'logged_house_name = %s' % (str)(house.house_number))
 						break
+
 		ownerlist = houseownerdb.all()
 		if house_exists:
 			for owner in ownerlist:
@@ -204,13 +211,24 @@ class newhome(MainHandler):
 		comm_house_pass = self.request.get("house_pass")
 		comm_house_owner = self.request.get("house_owner_name")
 		comm_house_contact = self.request.get("house_owner_contact")
-
-		dbIn = housedb(house_number = comm_house_number, house_pass = comm_house_pass, house_comm_id = comm_id)  
-		dbIn.put()
-
-		dbIn = houseownerdb(house_number = comm_house_number, house_owner = comm_house_owner,
-			house_comm_id = comm_id, house_contact = comm_house_contact, house_status = True )  
-		dbIn.put()
+		USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
+		PASS_RE = re.compile(r"^.{8,20}$")
+		Contact=re.compile(r"^[0-9]{10,10}$")
+		if(USER_RE.match(comm_house_number)):
+			if(PASS_RE.match(comm_house_pass)):
+				if(Contact.match(comm_house_contact)):
+					dbIn = housedb(house_number = comm_house_number, house_pass = comm_house_pass, house_comm_id = comm_id)  
+					dbIn.put()
+					dbIn = houseownerdb(house_number = comm_house_number, house_owner = comm_house_owner,
+						house_comm_id = comm_id, house_contact = comm_house_contact, house_status = True )  
+					dbIn.put()
+				else:
+					self.render("admindash.html",error="enter valid number")	
+			else:
+				self.render("admindash.html",error="retype")
+		else:
+			self.render("admindash.html", error="retype houseno")
+		time.sleep(1)
 		self.redirect("/loggedadmin")
 
 class loggedadmin(MainHandler):
@@ -238,8 +256,7 @@ class loggedadmin(MainHandler):
 			accountstatus = True
 		else:
 			amountleft = totalexpense - collection
-
-
+			
 		self.render("admindash.html", houses = houses, comm_name = comm_name, houses1 = houses1, amountleft = amountleft, accountstatus = accountstatus)
 
 class loggeduser(MainHandler):
@@ -269,35 +286,44 @@ class newMonth(MainHandler):
 		month = self.request.get("month")
 		year = self.request.get("year")
 		amount = self.request.get("amount")
-		paymentType = self.request.get("type")
-		detail = self.request.get("detail")
-		comm_id = self.request.cookies.get('logged_community_id')
-		dues = duesdb.all()
-		due_exists = False
-		for due in dues:
-			if due.due_month == month:
-				if due.due_year == year:
-					if due.due_type == paymentType:
-						if paymentType == "monthly":
-							due_exists = True
-							break
-						else:
-							if detail == due.due_detail:
-								due_exists = True
-								break
-
-		if not due_exists:
-			current_time = datetime.datetime.now()
-			houses = housedb.all()
+		Amount = re.compile(r"^[0-9]{1,10}$")
+		if Amount.match(amount):
+			paymentType = self.request.get("type")
+			detail = self.request.get("detail")
 			comm_id = self.request.cookies.get('logged_community_id')
-			for house in houses:
-				if house.house_comm_id == comm_id:
-					dbIn = duesdb(due_month = month, due_year = year, due_amount =(int)(amount), due_type = paymentType, due_detail = detail,
-						house_id = (str)(house.key()), due_created = current_time, community_id = comm_id)
-					dbIn.put()
+			dues = duesdb.all()
+			due_exists = False
+			Amount = re.compile(r"^.[0-9]{1,20}$")
+			if Amount.match(amount):
+				for due in dues:
+					if due.due_month == month:
+						if due.due_year == year:
+							if due.due_type == paymentType:
+								if paymentType == "monthly":
+									due_exists = True
+									break
+								else:
+									if detail == due.due_detail:
+										due_exists = True
+										break
+
+				if not due_exists:
+					current_time = datetime.datetime.now()
+					houses = housedb.all()
+					comm_id = self.request.cookies.get('logged_community_id')
+					for house in houses:
+						if house.house_comm_id == comm_id:
+							dbIn = duesdb(due_month = month, due_year = year, due_amount =(int)(amount), due_type = paymentType, due_detail = detail,
+								house_id = (str)(house.key()), due_created = current_time, community_id = comm_id)
+							dbIn.put()
+							time.sleep(1)
+							self.redirect("/loggedadmin")
+				else:
 					self.redirect("/loggedadmin")
+			else:
+				self.redirect("/loggedadmin")
 		else:
-			self.redirect("/loggedadmin")
+			self.redirect("/loggedadmin")		
 
 class logout(MainHandler):
 	def get(self):
@@ -311,18 +337,21 @@ class dues(MainHandler):
 		house_name = self.request.get("house_name")
 		dbIn = db.GqlQuery("select * from duesdb where house_id = '%(name)s' order by due_created" % {'name':house_id})
 		dues = dbIn.fetch(100)
-		self.render("dues.html", dues = dues, house_id = house_id, house_name = house_name)
+		comm_name = self.request.cookies.get('logged_community_name')
+		self.render("dues.html", dues = dues, house_id = house_id, house_name = house_name, comm_name = comm_name)
 
 class newexpense(MainHandler):
 	def post(self):
 		expense_detail = self.request.get("expense_detail")
 		expense_month = self.request.get("expense_month")
 		expense_year = self.request.get("expense_year")
+
 		expense_amount = (int)(self.request.get("expense_amount"))
 		comm_id = self.request.cookies.get('logged_community_id')
 		dbIn = expensesdb(expense_year = expense_year, expense_amount = expense_amount, expense_month = expense_month,
 			community_id = comm_id, expense_detail = expense_detail)
 		dbIn.put()
+		time.sleep(1)
 		self.redirect("/loggedadmin")
 
 class viewexpense(MainHandler):
@@ -330,19 +359,23 @@ class viewexpense(MainHandler):
 		expense_month = self.request.get("expense_month")
 		expense_year = self.request.get("expense_year")
 		comm_id = self.request.cookies.get('logged_community_id')
+		comm_name = self.request.cookies.get('logged_community_name')
 		expense_list = db.GqlQuery("select * from expensesdb where community_id = '%(kwarg)s' and expense_month = '%(month)s'" % {'kwarg':comm_id,'month':expense_month})
 		expenses = expense_list.fetch(100)
-		self.render("expenses.html", expenses = expenses)
+		self.render("expenses.html", expenses = expenses, comm_name = comm_name)
 
 class newmember(MainHandler):
 	def post(self):
 		member_name = self.request.get("member_name")
 		member_gender = self.request.get("member_gender")
 		member_DOB = self.request.get("member_DOB")
+		member_contact = self.request.get("member_contact")
+		member_occupation = self.request.get("member_occupation")
 		house_id = self.request.cookies.get('logged_house_id')
-		dbIn = membersdb(member_name = member_name, member_gender = member_gender, member_DOB = member_DOB,
+		dbIn = membersdb(member_name = member_name, member_gender = member_gender, member_DOB = member_DOB,member_contact = member_contact,member_occupation=member_occupation,
 			house_id = house_id)
 		dbIn.put()
+		time.sleep(1)
 		self.redirect("/loggeduser")
 
 
@@ -355,8 +388,8 @@ class paydue(MainHandler):
 		due_detail = self.request.get("due_detail")
 		due_type = self.request.get("due_type")
 		comm_id = self.request.cookies.get('logged_community_id')
-		comm_name = self.request.cookies.get('logged_community_name')
 		current_time = datetime.datetime.now()
+		comm_name = self.request.cookies.get('logged_community_name')
 		dues = duesdb.all()
 		due_found = False
 		for due in dues:
@@ -377,30 +410,31 @@ class paydue(MainHandler):
 				payment_type = due_type, payment_detail = due_detail, house_id = house_id, payment_created = current_time,
 				community_id = comm_id)
 			dbIn.put()
+			self.response.headers['Content-Type'] = 'application/pdf'
+			self.response.headers['Content-Disposition'] = 'attachment; filename=receipt.pdf'
+			c = canvas.Canvas(self.response.out, pagesize=A4)
+			c.drawString(100, 750, house_id)
 
-		self.response.headers['Content-Type'] = 'application/pdf'
-		self.response.headers['Content-Disposition'] = 'attachment; filename=receipt.pdf'
-		c = canvas.Canvas(self.response.out, pagesize=A4)
-		c.drawString(100, 750, house_id)
+			c.drawString(200, 700, "Month")
+			c.drawString(200, 650, "Year")
+			c.drawString(200, 600, "Amount")
+			c.drawString(200, 550, "Paid On")
 
-		c.drawString(200, 700, "Month")
-		c.drawString(200, 600, "Year")
-		c.drawString(200, 500, "Amount")
-		c.drawString(200, 400, "Paid On")
-
-		c.drawString(200, 650, "--------------------------------------------------")
-		c.drawString(200, 550, "--------------------------------------------------")
-		c.drawString(200, 450, "--------------------------------------------------")
+			c.drawString(100, 675, "-------------------------------------------------------------------------------------------------------")
+			c.drawString(100, 625, "-------------------------------------------------------------------------------------------------------")
+			c.drawString(100, 575, "-------------------------------------------------------------------------------------------------------")
 
 
-		c.drawString(200, 800, comm_name)
-		c.drawString(400, 700, due_month)
-		c.drawString(400, 600, due_year)
-		c.drawString(400, 500, due_amount)
-		c.drawString(400, 400, (str)(current_time.date()))
-		c.showPage()
-		c.save()
-		# self.redirect('/loggedadmin')
+			c.drawString(250, 800, comm_name)
+			c.drawString(400, 700, due_month)
+			c.drawString(400, 650, due_year)
+			c.drawString(400, 600, "Rs " + due_amount + " /-")
+			c.drawString(400, 550, (str)(current_time.date()))
+			c.showPage()
+			c.save()
+		else:
+			self.redirect('/loggedadmin')
+
 
 class editpassword(MainHandler):
 	def post (self):
@@ -415,6 +449,7 @@ class editpassword(MainHandler):
 					community.community_pass = new_password
 					community.put()
 					break
+		time.sleep(1)
 		self.redirect("/loggedadmin")
 
 class editpassworduser(MainHandler):
@@ -430,6 +465,7 @@ class editpassworduser(MainHandler):
 					house.house_pass = new_password
 					house.put()
 					break
+		time.sleep(1)
 		self.redirect("/loggedadmin")
 
 class changestatus(MainHandler):
@@ -460,6 +496,7 @@ class changestatus(MainHandler):
 						owner.house_status = True
 					owner.put()
 					break
+		time.sleep(1)
 		self.redirect("/loggedadmin")
 
 
@@ -481,6 +518,5 @@ app = webapp2.WSGIApplication([
     ('/newmember', newmember),
     ('/editpassword', editpassword),
     ('/editpassworduser', editpassworduser),
-    ('/changestatus', changestatus),
-    ('/test', PDFHandler)
+    ('/changestatus', changestatus)
 ], debug=True)
